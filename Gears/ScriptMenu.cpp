@@ -113,7 +113,8 @@ namespace {
     std::vector<std::string> camAttachPoints {
         "Player head",
         "Vehicle",
-        "Vanilla FPV"
+        "Vanilla FPV",
+        "[DBG] Gameplay"
     };
 
     std::vector<std::string> diDevicesInfo{ "Press Enter to refresh." };
@@ -1847,6 +1848,9 @@ void update_cameraoptionsmenu() {
             break;
         case 2:
             camInfo = "Camera is static with vehicle and uses vanilla FPV camera offsets.";
+            break;
+        case 3:
+            camInfo = "[Dbg] Gameplay camera";
             break;
         default:
             camInfo = "Invalid selection";

@@ -16,6 +16,8 @@
 #include <inc/natives.h>
 #include <fmt/format.h>
 
+#include "Memory/NativeMatrix.h"
+
 using VExt = VehicleExtensions;
 
 extern Vehicle g_playerVehicle;
@@ -57,6 +59,10 @@ namespace {
     // forward camera movement
     float accelMoveFwd = 0.0f;
     std::vector<float> accelAvg;
+
+    // gameplay cam
+    uint64_t* CameraPoolAddress = nullptr;
+    uint64_t* GameplayCameraAddress = nullptr;
 }
 
 namespace FPVCam {
@@ -74,7 +80,33 @@ void FPVCam::InitOffsets() {
     if (g_gameVersion < G_VER_1_0_1290_1_STEAM) {
         fpvCamOffsetXOffset = 0x450 - 40;
     }
+
+    // Yoinked from SHVDN
+    auto address = mem::FindPattern("\x48\x8B\xC8\xEB\x02\x33\xC9\x48\x85\xC9\x74\x26", "xxxxxxxxxxxx") - 9;
+    CameraPoolAddress = reinterpret_cast<uint64_t*>(*reinterpret_cast<int*>(address) + address + 4);
+    logger.Write(DEBUG, "[Camera] CameraPoolAddress: 0x%p", CameraPoolAddress);
+
+    address = mem::FindPattern("\x48\x8B\xC7\xF3\x0F\x10\x0D", "xxxxxxx") - 0x1D;
+    address = address + *reinterpret_cast<int*>(address)+4;
+    GameplayCameraAddress = reinterpret_cast<uint64_t*>(*reinterpret_cast<int*>(address + 3) + address + 7);
+    logger.Write(DEBUG, "[Camera] GameplayCameraAddress: 0x%p", GameplayCameraAddress);
 }
+
+
+uintptr_t GetCameraAddress(int handle) {
+    uint index = (uint)(handle >> 8);
+    uint64_t poolAddr = *CameraPoolAddress;
+    if (*(byte*)(index + *(long*)(poolAddr + 8)) == (byte)(handle & 0xFF)) {
+        return (*(long*)poolAddr + (index * *(uint*)(poolAddr + 20)));
+    }
+    return 0;
+}
+
+uintptr_t GetGameplayCameraAddress() {
+    return static_cast<uintptr_t>(*GameplayCameraAddress);
+}
+
+
 
 void FPVCam::updateDriverHeadOffset() {
     Vector3 dHeadPos = PED::GET_PED_BONE_COORDS(g_playerPed, 0x796E, 0.0f, 0.0f, 0.0f);
@@ -162,7 +194,7 @@ void FPVCam::Update() {
     PAD::DISABLE_CONTROL_ACTION(0, eControl::ControlVehicleCinCam, true);
 
     // Initialize camera
-    if (cameraHandle == -1) {
+    if (g_settings().Misc.Camera.AttachId != 3 && cameraHandle == -1) {
         initCam();
 
         CAM::SET_CAM_ACTIVE(cameraHandle, true);
@@ -173,6 +205,9 @@ void FPVCam::Update() {
             Math::Near(g_vehData.mSteeringAngle, 0.0f, 0.01f))
         // Just so we have a valid-ish offset
         updateDriverHeadOffset();
+    }
+    else if (g_settings().Misc.Camera.AttachId == 3) {
+        CancelCam();
     }
 
     if (MT_LookingLeft() || MT_LookingRight()) {
@@ -250,6 +285,14 @@ void FPVCam::Update() {
     }
 
     switch(attachId) {
+        case 3: {
+            auto addr = GetGameplayCameraAddress();
+            NativeMatrix4x4* pCamMatrix = (NativeMatrix4x4*)(addr + 0x1F0);
+
+            // TODO: Move the thing around and rotate the thing
+            
+            break;
+        }
         case 2: {
             Hash modelHash = ENTITY::GET_ENTITY_MODEL(g_playerVehicle);
             int index = 0xFFFF;

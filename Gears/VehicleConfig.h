@@ -193,7 +193,7 @@ public:
         // [CAM]
         struct {
             Tracked<bool> Enable = true;
-            Tracked<int> AttachId = 0; // 0: Head, 1: Vehicle, 2: FPV Offset?
+            Tracked<int> AttachId = 0; // 0: Head, 1: Vehicle, 2: FPV Offset, 3: Gameplay cam
             Tracked<bool> RemoveHead = true;
 
             struct {
