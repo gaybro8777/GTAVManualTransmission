@@ -2,6 +2,8 @@
 #include <string>
 #include <vector>
 
+#include "VehicleData.hpp"
+
 enum EShiftMode : int {
     Sequential = 0,
     HPattern = 1,
@@ -154,6 +156,9 @@ public:
         Tracked<bool> DownshiftBlip = true;
         Tracked<float> ClutchRateMult = 1.0f;
         Tracked<float> RPMTolerance = 0.2f;
+        Tracked<float> DownshiftBlipThrottle = 0.66f;
+        Tracked<float> DownshiftBlipDuration = 0.75f;
+        Tracked<bool> DownshiftBlipMap = false;
     } ShiftOptions;
 
     // [AUTO_PARAMS]

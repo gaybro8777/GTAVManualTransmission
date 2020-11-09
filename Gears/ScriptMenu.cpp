@@ -423,12 +423,23 @@ void update_shiftingoptionsmenu() {
     g_menu.Title("Shifting options");
     g_menu.Subtitle(MenuSubtitleConfig());
 
-    g_menu.BoolOption("Cut throttle on upshift", g_settings().ShiftOptions.UpshiftCut,
+    g_menu.BoolOption("Upshift throttle cut", g_settings().ShiftOptions.UpshiftCut,
         { "Helps rev matching.",
             "Only applies to sequential mode."});
-    g_menu.BoolOption("Blip throttle on downshift", g_settings().ShiftOptions.DownshiftBlip,
+    g_menu.BoolOption("Downshift throttle blip", g_settings().ShiftOptions.DownshiftBlip,
         { "Helps rev matching.",
             "Only applies to sequential mode." });
+
+    g_menu.FloatOptionCb("Blipping throttle", g_settings().ShiftOptions.DownshiftBlipThrottle,
+        0.0f, 1.0f, 0.05f, getKbEntry);
+
+    g_menu.FloatOptionCb("Blipping RPM mult limit", g_settings().ShiftOptions.DownshiftBlipDuration,
+        0.0f, 2.0f, 0.05f, getKbEntry,
+        { "Blip until expected RPM times this multiplier is reached." });
+
+    g_menu.BoolOption("Blipping map", g_settings().ShiftOptions.DownshiftBlipMap);
+
+
     g_menu.FloatOption("Clutch rate multiplier", g_settings().ShiftOptions.ClutchRateMult, 0.05f, 20.0f, 0.05f,
         { "Change how fast clutching is. Below 1 is slower, higher than 1 is faster.",
             "Applies to sequential and automatic mode." });

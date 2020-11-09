@@ -1718,18 +1718,28 @@ void handleRPM() {
             clutch = g_gearStates.ClutchVal;
 
         // Only lift and blip when no clutch used
-        if (clutchInput == 0.0f) {
+        //if (clutchInput == 0.0f) {
             if (g_gearStates.ShiftDirection == ShiftDirection::Up &&
                 g_settings().ShiftOptions.UpshiftCut) {
                 PAD::DISABLE_CONTROL_ACTION(0, ControlVehicleAccelerate, true);
             }
+
             if (g_gearStates.ShiftDirection == ShiftDirection::Down &&
                 g_settings().ShiftOptions.DownshiftBlip) {
-                float expectedRPM = g_vehData.mWheelAverageDrivenTyreSpeed / (g_vehData.mDriveMaxFlatVel / g_vehData.mGearRatios[g_vehData.mGearCurr - 1]);
-                if (g_vehData.mRPM < expectedRPM * 0.75f)
-                    PAD::_SET_CONTROL_NORMAL(0, ControlVehicleAccelerate, 0.66f);
+                float maxSpeedForGear = g_vehData.mDriveMaxFlatVel / g_vehData.mGearRatios[g_gearStates.NextGear];
+                float expectedRPM = g_vehData.mWheelAverageDrivenTyreSpeed / maxSpeedForGear;
+                if (g_vehData.mRPM < expectedRPM * g_settings().ShiftOptions.DownshiftBlipDuration) {
+                    float blipVal = g_settings().ShiftOptions.DownshiftBlipThrottle;
+                    if (g_settings().ShiftOptions.DownshiftBlipMap) {
+                        blipVal = map(g_gearStates.ClutchVal, 0.0f, 1.0f, blipVal, 0.0f);
+                    }
+                    PAD::_SET_CONTROL_NORMAL(0, ControlVehicleAccelerate, blipVal);
+                    VExt::SetThrottle(g_playerVehicle, blipVal);
+                    VExt::SetThrottleP(g_playerVehicle, blipVal);
+                    //UI::ShowText(0.5f, 0.5f, 0.5f, fmt::format("Blipval: {:.2f}", blipVal));
+                }
             }
-        }
+        //}
     }
 
     // Ignores clutch 

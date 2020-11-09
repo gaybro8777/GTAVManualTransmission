@@ -172,6 +172,10 @@ void VehicleConfig::LoadSettings() {
     // [SHIFT_OPTIONS]
     LOAD_VAL("SHIFT_OPTIONS", "UpshiftCut", ShiftOptions.UpshiftCut);
     LOAD_VAL("SHIFT_OPTIONS", "DownshiftBlip", ShiftOptions.DownshiftBlip);
+    LOAD_VAL("SHIFT_OPTIONS", "DownshiftBlipThrottle", ShiftOptions.DownshiftBlipThrottle);
+    LOAD_VAL("SHIFT_OPTIONS", "DownshiftBlipDuration", ShiftOptions.DownshiftBlipDuration);
+    LOAD_VAL("SHIFT_OPTIONS", "DownshiftBlipMap", ShiftOptions.DownshiftBlipMap);
+
     LOAD_VAL("SHIFT_OPTIONS", "ClutchRateMult", ShiftOptions.ClutchRateMult);
     LOAD_VAL("SHIFT_OPTIONS", "RPMTolerance", ShiftOptions.RPMTolerance);
 
@@ -340,6 +344,10 @@ void VehicleConfig::saveGeneral() {
     // [SHIFT_OPTIONS]
     SAVE_VAL("SHIFT_OPTIONS", "UpshiftCut", ShiftOptions.UpshiftCut);
     SAVE_VAL("SHIFT_OPTIONS", "DownshiftBlip", ShiftOptions.DownshiftBlip);
+    SAVE_VAL("SHIFT_OPTIONS", "DownshiftBlipThrottle", ShiftOptions.DownshiftBlipThrottle);
+    SAVE_VAL("SHIFT_OPTIONS", "DownshiftBlipDuration", ShiftOptions.DownshiftBlipDuration);
+    SAVE_VAL("SHIFT_OPTIONS", "DownshiftBlipMap", ShiftOptions.DownshiftBlipMap);
+
     SAVE_VAL("SHIFT_OPTIONS", "ClutchRateMult", ShiftOptions.ClutchRateMult);
     SAVE_VAL("SHIFT_OPTIONS", "RPMTolerance", ShiftOptions.RPMTolerance);
 
